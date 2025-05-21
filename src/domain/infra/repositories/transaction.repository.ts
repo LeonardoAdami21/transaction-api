@@ -27,6 +27,7 @@ export class TransactionRepository implements ITransaction {
     const recentTransactions = this.transactions.filter(
       (transaction) => transaction.timestamp >= cutOffTime,
     );
+
     return recentTransactions;
   }
   async deleteAll(): Promise<any> {

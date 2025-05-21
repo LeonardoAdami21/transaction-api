@@ -15,17 +15,16 @@ export class Statistics {
   }
 
   // Transforma uma lista de transações em estatísticas
-  static fromTransactions(transactions: Transaction[]): Statistics {
-    if (transactions.length === 0) {
-      return Statistics.empty();
+  static fromTransactions(amounts: number[]): Statistics {
+    if (!amounts.length) {
+      return new Statistics();
     }
 
-    // Calcula as estatísticas
-    const count = transactions.length;
-    const sum = transactions.reduce((acc, curr) => acc + curr.amount, 0);
+    const count = amounts.length;
+    const sum = amounts.reduce((acc, amount) => acc + amount, 0);
     const avg = sum / count;
-    const min = Math.min(...transactions.map((t) => t.amount));
-    const max = Math.max(...transactions.map((t) => t.amount));
+    const min = Math.min(...amounts);
+    const max = Math.max(...amounts);
 
     return new Statistics(count, sum, avg, min, max);
   }

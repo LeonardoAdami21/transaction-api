@@ -44,7 +44,9 @@ export class TransactionController {
         createTransactionDto.amount,
         timestamp,
       );
-      return transaction;
+      return {
+        message: 'Transação criada com sucesso',
+      };
     } catch (error) {
       this.logger.error(`Erro ao criar transação: ${error.message}`);
       if (error instanceof BadRequestException) {
