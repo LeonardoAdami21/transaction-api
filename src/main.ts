@@ -5,19 +5,19 @@ import { AppModule } from './app.module';
 import { initSwagger } from './app.swagger';
 import { appPort } from './domain/infra/env/envoriment';
 import helmet from 'helmet';
+import { MetricsService } from './domain/infra/metrics/metrics.service';
+import { MetricsInterceptor } from './domain/infra/interceptors/metrics.interceptor';
+import { CustomLoggerService } from './domain/infra/logger/logger.service';
+import { HttpExceptionFilter } from './domain/filters/http.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log'],
+    logger: new CustomLoggerService(),
     bufferLogs: true,
   });
 
   app.use(helmet());
-  app.enableCors({
-    origin: 'http://localhost:5173',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
+  app.enableCors({});
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -28,6 +28,9 @@ async function bootstrap() {
       },
     }),
   );
+  app.useGlobalFilters(new HttpExceptionFilter());
+  const metrics = app.get(MetricsService);
+  app.useGlobalInterceptors(new MetricsInterceptor(metrics));
   initSwagger(app);
 
   const logger = new Logger('NestApplication');

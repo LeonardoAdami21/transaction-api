@@ -8,8 +8,8 @@ export class TransactionRepository implements ITransaction {
 
   async save(transaction: Transaction) {
     try {
-      const transactions = this.transactions.push(transaction);
-      return transactions;
+      const result = await this.transactions.push(transaction);
+      return result;
     } catch (error) {
       throw new InternalServerErrorException('Error saving transaction');
     }
@@ -23,11 +23,12 @@ export class TransactionRepository implements ITransaction {
     }
   }
   async getRecentTransactions(seconds: number): Promise<Transaction[]> {
-    const cutOffTime = new Date(Date.now() - seconds * 1000);
-    const recentTransactions = this.transactions.filter(
-      (transaction) => transaction.timestamp >= cutOffTime,
-    );
+    const now = new Date();
+    const pastTimestamp = new Date(now.getTime() - seconds * 1000);
 
+    const recentTransactions = this.transactions.filter(
+      (transaction) => transaction.timestamp >= pastTimestamp,
+    );
     return recentTransactions;
   }
   async deleteAll(): Promise<any> {

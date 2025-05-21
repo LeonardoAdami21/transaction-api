@@ -17,6 +17,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateTransactionDto } from '../usecases/dto/create-transaction.dto';
+import { MetricsService } from '../infra/metrics/metrics.service';
 
 @ApiTags('Transações')
 @Controller('v2/transactions')
@@ -25,6 +26,7 @@ export class TransactionController {
   constructor(
     private readonly createTransactionUseCase: CreateTransactionUseCase,
     private readonly deleteTransactionUseCase: DeleteTransactionUseCase,
+    private readonly metricsService: MetricsService,
   ) {}
 
   @ApiOperation({ summary: 'Cria uma nova transação' })
@@ -39,12 +41,11 @@ export class TransactionController {
       `Criando nova transação...${JSON.stringify(createTransactionDto)}`,
     );
     try {
-      const timestamp = new Date(createTransactionDto.timestamp);
-      const transaction = await this.createTransactionUseCase.execute(
-        createTransactionDto.amount,
-        timestamp,
-      );
+      const result =
+        await this.createTransactionUseCase.execute(createTransactionDto);
+      this.metricsService.recordTransactionAmount(createTransactionDto.amount);
       return {
+        statusCode: 201,
         message: 'Transação criada com sucesso',
       };
     } catch (error) {
