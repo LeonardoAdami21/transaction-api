@@ -1,23 +1,19 @@
-import { Transaction } from './transaction.entity';
-
 export class Statistics {
   constructor(
-    public readonly count: number = 0,
-    public readonly sum: number = 0,
-    public readonly avg: number = 0,
-    public readonly min: number = 0,
-    public readonly max: number = 0,
+    public readonly count: number,
+    public readonly sum: number,
+    public readonly avg: number,
+    public readonly min: number,
+    public readonly max: number,
   ) {}
 
-  // Cria uma estatística vazia
   static empty(): Statistics {
-    return new Statistics();
+    return new Statistics(0, 0, 0, 0, 0);
   }
 
-  // Transforma uma lista de transações em estatísticas
-  static fromTransactions(amounts: number[]): Statistics {
-    if (!amounts.length) {
-      return new Statistics();
+  static fromAmounts(amounts: number[]): Statistics {
+    if (amounts.length === 0) {
+      return Statistics.empty();
     }
 
     const count = amounts.length;

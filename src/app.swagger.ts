@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { appPort, nodeEnv } from './domain/infra/env/envoriment';
+import { appPort, nodeEnv } from './infra/env/envoriment';
 
 export const initSwagger = (app: INestApplication) => {
   const HOST =

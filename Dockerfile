@@ -1,16 +1,55 @@
-FROM node:22-alpine
+# Build stage
+FROM node:22-alpine AS development
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./ yarn.lock ./
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock ./
 
-RUN npm install
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
-RUN npm i -g @nestjs/cli
-
+# Copy source code
 COPY . .
 
+# Build the application
+RUN yarn start:dev
+
+# Production stage
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock ./
+
+# Install only production dependencies
+RUN yarn install --frozen-lockfile --production && yarn cache clean
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Change ownership to non-root user
+USER nestjs
+
+# Expose port
 EXPOSE 7000
 
-CMD [ "npm","run", "start:dev" ]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node dist/main.js || exit 1
 
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "dist/main.js"]
