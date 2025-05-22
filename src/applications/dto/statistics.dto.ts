@@ -3,35 +3,35 @@ import { IsNumber } from 'class-validator';
 
 export class StatisticsDto {
   @ApiProperty({
-    description: 'Quantidade total de transações nos últimos 60s',
+    description: 'Number of transactions in the last 60 seconds',
     example: 10,
   })
   @IsNumber()
   count: number;
 
   @ApiProperty({
-    description: 'Soma total dos valores transacionados',
+    description: 'Sum of all transaction amounts in the last 60 seconds',
     example: 1234.56,
   })
   @IsNumber()
   sum: number;
 
   @ApiProperty({
-    description: 'Média dos valores transacionados',
+    description: 'Average of all transaction amounts in the last 60 seconds',
     example: 123.45,
   })
   @IsNumber()
   avg: number;
 
   @ApiProperty({
-    description: 'Menor valor transacionado',
+    description: 'Minimum transaction amount in the last 60 seconds',
     example: 12.34,
   })
   @IsNumber()
   min: number;
 
   @ApiProperty({
-    description: 'Maior valor transacionado',
+    description: 'Maximum transaction amount in the last 60 seconds',
     example: 456.78,
   })
   @IsNumber()
