@@ -8,15 +8,15 @@ export class Transaction {
   }
 
   private validateAmount(amount: number) {
-    if (amount <= 0) {
-      throw new Error('A quantidade deve ser maior que zero');
+    if (amount < 0) {
+      throw new Error('Amount cannot be negative');
     }
   }
 
   private validateTimestamp(timestamp: Date) {
     const date = new Date();
     if (timestamp > date) {
-      throw new Error('Transação nao pode ser criada no futuro');
+      throw new Error('Transaction cannot be in the future');
     }
   }
 
