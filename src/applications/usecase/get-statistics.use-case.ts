@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionRepository } from 'src/domain/repositories/transaction.repository';
+import { TransactionRepository } from '../../domain/repositories/transaction.repository';
 import { Statistics } from '../../domain/entities/statistics.entity';
 import { LoggerService } from '../../infra/logger/logger.service';
 
@@ -8,7 +8,6 @@ export class GetStatisticsUseCase {
   private static readonly TIME_WINDOW_SECONDS = 60;
   constructor(
     private readonly transactionRepository: TransactionRepository,
-    private readonly logger: LoggerService,
   ) {}
 
   async execute() {

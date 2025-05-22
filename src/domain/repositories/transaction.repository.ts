@@ -13,29 +13,12 @@ export class TransactionRepository implements ITransactionRepository {
     return [...this.transactions];
   }
 
-  async findByTimestampRange(
-    startTime: Date,
-    endTime: Date,
-  ): Promise<Transaction[]> {
-    return this.transactions.filter(
-      (transaction) =>
-        transaction.timestamp >= startTime && transaction.timestamp <= endTime,
-    );
-  }
-
   async deleteAll(): Promise<void> {
     this.transactions = [];
   }
 
-  getTransactionCount(): number {
-    return this.transactions.length;
-  }
 
-  async count() {
-    return this.transactions.length;
-  }
-
-  async findByTimeWindow(seconds: number): Promise<Transaction[]> {
+  async findByTimeWindow(seconds: number) {
     const result = this.transactions.filter((transaction) =>
       transaction.isWithinTimeWindow(seconds),
     );
