@@ -1,31 +1,32 @@
-import { ConflictException } from '@nestjs/common';
-
 export class Transaction {
   constructor(
     public readonly amount: number,
     public readonly timestamp: Date,
-    public readonly id: string = generateUUID(),
   ) {
     this.validateAmount(amount);
     this.validateTimestamp(timestamp);
   }
 
   private validateAmount(amount: number) {
-    if (amount < 0) {
-      throw new ConflictException('Amount must be greater than zero');
+    if (amount <= 0) {
+      throw new Error('A quantidade deve ser maior que zero');
     }
   }
 
   private validateTimestamp(timestamp: Date) {
-    if (timestamp > new Date()) {
-      throw new ConflictException('Timestamp must be in the future');
+    const date = new Date();
+    if (timestamp > date) {
+      throw new Error('Transação nao pode ser criada no futuro');
     }
   }
-}
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+
+  isInFuture(currentTime: Date = new Date()): boolean {
+    return this.timestamp > currentTime;
+  }
+
+  isWithinTimeWindow(seconds: number): boolean {
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - seconds * 1000);
+    return this.timestamp >= windowStart;
+  }
 }

@@ -1,19 +1,15 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { initSwagger } from './app.swagger';
-import { appPort } from './domain/infra/env/envoriment';
-import helmet from 'helmet';
-import { MetricsService } from './domain/infra/metrics/metrics.service';
-import { MetricsInterceptor } from './domain/infra/interceptors/metrics.interceptor';
-import { CustomLoggerService } from './domain/infra/logger/logger.service';
-import { HttpExceptionFilter } from './domain/filters/http.filter';
+import { appPort } from './infra/env/envoriment';
+import { LoggerService } from './infra/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: new CustomLoggerService(),
     bufferLogs: true,
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
   app.use(helmet());
@@ -23,20 +19,15 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
-  const metrics = app.get(MetricsService);
-  app.useGlobalInterceptors(new MetricsInterceptor(metrics));
   initSwagger(app);
 
   const logger = new Logger('NestApplication');
   app.listen(appPort, '0.0.0.0', async () => {
     logger.log(`Running At: ${await app.getUrl()}`);
     logger.log(`Documentation: ${await app.getUrl()}/v2/docs`);
+    logger.log(`Metrics: ${await app.getUrl()}/v2/metrics`);
   });
 }
 bootstrap();
